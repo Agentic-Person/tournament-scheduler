@@ -19,6 +19,9 @@ interface TournamentState {
   autoSchedule: () => void;
   checkConflicts: () => void;
   exportToCSV: () => string;
+  clearAllTeams: () => void;
+  getAgeGroups: () => string[];
+  getCities: () => string[];
 }
 
 const defaultConfig: TournamentConfig = {
@@ -34,6 +37,14 @@ const defaultConfig: TournamentConfig = {
     '08:00 AM', '09:30 AM', '11:00 AM', '12:30 PM',
     '02:00 PM', '03:30 PM', '05:00 PM', '06:30 PM'
   ],
+  groupByAge: true,
+  groupByCity: false,
+};
+
+// Parse grade level to number for comparison
+const parseGrade = (grade: string): number => {
+  const match = grade?.toLowerCase().match(/(\d+)(?:st|nd|rd|th)?/);
+  return match ? parseInt(match[1]) : 0;
 };
 
 export const useTournamentStore = create<TournamentState>((set, get) => ({
@@ -51,16 +62,31 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
     games: state.games.filter((g) => g.team1Id !== teamId && g.team2Id !== teamId),
   })),
 
+  clearAllTeams: () => set({ teams: [], games: [], conflicts: [] }),
+
   importTeamsFromCSV: (csv) => {
     const lines = csv.trim().split('\n');
-    const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
     
-    const nameIndex = headers.indexOf('name');
-    const tierIndex = headers.indexOf('tier');
-    const genderIndex = headers.indexOf('gender');
+    // Map possible column names
+    const findColumn = (names: string[]): number => {
+      for (const name of names) {
+        const idx = headers.findIndex(h => h.includes(name.toLowerCase()));
+        if (idx !== -1) return idx;
+      }
+      return -1;
+    };
     
-    if (nameIndex === -1) {
-      console.error('CSV must have a "name" column');
+    const nameIdx = findColumn(['team name', 'name']);
+    const ageGroupIdx = findColumn(['age group', 'age']);
+    const gradeIdx = findColumn(['grade level', 'grade']);
+    const cityIdx = findColumn(['city', 'location']);
+    const winsIdx = findColumn(['wins', 'win']);
+    const lossesIdx = findColumn(['losses', 'loss']);
+    const teamIdIdx = findColumn(['team id', 'id']);
+    
+    if (nameIdx === -1) {
+      console.error('CSV must have a "Team Name" or "name" column');
       return 0;
     }
 
@@ -68,18 +94,38 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
     
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim());
-      if (values[nameIndex]) {
+      if (values[nameIdx]) {
         newTeams.push({
           id: crypto.randomUUID(),
-          name: values[nameIndex],
-          tier: (tierIndex !== -1 ? values[tierIndex] : 'novice') as 'novice' | 'intermediate' | 'advanced',
-          gender: (genderIndex !== -1 ? values[genderIndex] : 'male') as 'male' | 'female',
+          name: values[nameIdx],
+          teamId: teamIdIdx !== -1 ? values[teamIdIdx] : undefined,
+          ageGroup: ageGroupIdx !== -1 ? values[ageGroupIdx] : undefined,
+          gradeLevel: gradeIdx !== -1 ? values[gradeIdx] : undefined,
+          city: cityIdx !== -1 ? values[cityIdx] : undefined,
+          wins: winsIdx !== -1 ? parseInt(values[winsIdx]) || 0 : undefined,
+          losses: lossesIdx !== -1 ? parseInt(values[lossesIdx]) || 0 : undefined,
         });
       }
     }
 
     set((state) => ({ teams: [...state.teams, ...newTeams] }));
     return newTeams.length;
+  },
+
+  getAgeGroups: () => {
+    const groups = new Set<string>();
+    get().teams.forEach(t => {
+      if (t.ageGroup) groups.add(t.ageGroup);
+    });
+    return Array.from(groups).sort();
+  },
+
+  getCities: () => {
+    const cities = new Set<string>();
+    get().teams.forEach(t => {
+      if (t.city) cities.add(t.city);
+    });
+    return Array.from(cities).sort();
   },
 
   updateConfig: (config) => set((state) => ({
