@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-primary: #0f0f0f;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-tertiary: #2a2a2a;
+  --color-accent: #8b7355;
+  --color-accent-light: #a08060;
+  --color-text-primary: #e5e5e5;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #737373;
+  --color-border: #333333;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-bg-primary);
+}
+
+/* Focus Ring */
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Drag and Drop Styles */
+.dragging {
+  opacity: 0.5;
+  cursor: grabbing !important;
+}
+
+.drag-over {
+  background-color: rgba(139, 115, 85, 0.1);
+  border-color: var(--color-accent) !important;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes pulse-accent {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(139, 115, 85, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(139, 115, 85, 0);
+  }
+}
+
+.pulse-accent {
+  animation: pulse-accent 2s infinite;
+}
+
+/* Button Hover Effects */
+button:not(:disabled) {
+  transition: all 0.2s ease;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Card Hover */
+.card-hover {
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Conflict Badge */
+.conflict-badge {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+}
+
+/* Success Badge */
+.success-badge {
+  background: linear-gradient(135deg, #16a34a 0%, #166534 100%);
+}
+
+/* Warning Badge */
+.warning-badge {
+  background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%);
+}
