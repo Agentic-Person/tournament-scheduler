@@ -24,6 +24,11 @@ export interface Game {
   day: number;
   timeSlot: number;
   scheduled?: boolean;
+  status?: 'scheduled' | 'in-progress' | 'completed' | 'conflict';
+  score?: {
+    home: number;
+    away: number;
+  };
 }
 
 export interface TournamentConfig {
@@ -45,4 +50,6 @@ export interface Conflict {
   gameId: string;
   type: 'back-to-back' | 'same-team' | 'court-overlap';
   message: string;
+  description?: string;
+  severity?: 'warning' | 'error';
 }

@@ -122,8 +122,8 @@ export function ConfigPanel() {
               <div>
                 <label className="text-xs text-stone-500 mb-1 block">Days</label>
                 <select
-                  value={config.numberOfDays}
-                  onChange={(e) => setConfig({ numberOfDays: parseInt(e.target.value) })}
+                  value={config.days}
+                  onChange={(e) => setConfig({ days: parseInt(e.target.value) })}
                   className="w-full bg-[#2a2a2a] text-stone-200 px-3 py-2 rounded-lg 
                     border border-[#444] focus:border-[#8b7355] focus:outline-none text-sm"
                 >
@@ -174,8 +174,8 @@ export function ConfigPanel() {
                 min={0}
                 max={120}
                 step={5}
-                value={config.minRestBetweenGames}
-                onChange={(e) => setConfig({ minRestBetweenGames: parseInt(e.target.value) })}
+                value={config.restPeriod}
+                onChange={(e) => setConfig({ restPeriod: parseInt(e.target.value) })}
                 className="w-full bg-[#2a2a2a] text-stone-200 px-3 py-2 rounded-lg 
                   border border-[#444] focus:border-[#8b7355] focus:outline-none text-sm"
               />
@@ -227,9 +227,9 @@ export function ConfigPanel() {
             <div className="text-stone-500">Games:</div>
             <div className="text-stone-200 text-right">{games.length}</div>
             <div className="text-stone-500">Courts:</div>
-            <div className="text-stone-200 text-right">{config.courts.length}</div>
+            <div className="text-stone-200 text-right">{config.courts}</div>
             <div className="text-stone-500">Time Slots:</div>
-            <div className="text-stone-200 text-right">{config.timeSlots.length}</div>
+            <div className="text-stone-200 text-right">{config.timeSlots.length.toString()}</div>
           </div>
         </div>
       </div>

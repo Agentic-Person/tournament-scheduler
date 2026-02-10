@@ -4,17 +4,17 @@ import { useTournamentStore } from '../stores/tournamentStore';
 import type { Game } from '../types';
 
 interface ScheduleCellProps {
-  timeSlotId: string;
-  courtId: string;
+  timeSlot: number;
+  court: number;
   day: number;
   game?: Game;
   isConflict?: boolean;
 }
 
-function ScheduleCell({ timeSlotId, courtId, day, game, isConflict }: ScheduleCellProps) {
+function ScheduleCell({ timeSlot, court, day, game, isConflict }: ScheduleCellProps) {
   const { isOver, setNodeRef } = useDroppable({
-    id: `slot-${day}-${timeSlotId}-${courtId}`,
-    data: { timeSlotId, courtId, day },
+    id: `slot-${day}-${timeSlot}-${court}`,
+    data: { timeSlot, court, day },
   });
 
   return (
@@ -66,9 +66,7 @@ function DaySchedule({ day }: DayScheduleProps) {
                 className="text-xs text-[#a08060] font-medium text-center py-2 bg-[#2a2a2a] rounded"
               >
                 {court.name}
-                {court.location && (
-                  <span className="block text-[10px] text-stone-600">{court.location}</span>
-                )}
+                
               </div>
             ))}
           </div>
@@ -90,9 +88,10 @@ function DaySchedule({ day }: DayScheduleProps) {
                   </div>
                   
                   {/* Court Cells */}
-                  {courts.map((court) => {
+                  {courts.map((_court, courtIdx) => {
+                    const globalSlotIdx = timeSlots.findIndex((s) => s.id === slot.id);
                     const game = games.find(
-                      (g) => g.timeSlotId === slot.id && g.courtId === court.id
+                      (g) => g.timeSlot === globalSlotIdx && g.court === courtIdx + 1
                     );
                     const hasConflict = conflicts.some(
                       (c) => c.gameId === game?.id
@@ -100,9 +99,9 @@ function DaySchedule({ day }: DayScheduleProps) {
                     
                     return (
                       <ScheduleCell
-                        key={`${slot.id}-${court.id}`}
-                        timeSlotId={slot.id}
-                        courtId={court.id}
+                        key={`${globalSlotIdx}-${courtIdx}`}
+                        timeSlot={globalSlotIdx}
+                        court={courtIdx + 1}
                         day={day}
                         game={game}
                         isConflict={hasConflict}

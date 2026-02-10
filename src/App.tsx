@@ -24,7 +24,7 @@ function App() {
   const teams = useTournamentStore((state) => state.teams);
   const addGame = useTournamentStore((state) => state.addGame);
   const moveGame = useTournamentStore((state) => state.moveGame);
-  const timeSlots = useTournamentStore((state) => state.timeSlots);
+  // const timeSlots = useTournamentStore((state) => state.timeSlots); // not currently used
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -61,11 +61,8 @@ function App() {
       const slotData = over.data.current;
       if (!slotData) return;
       
-      const { timeSlotId, courtId, day } = slotData;
-      const timeSlot = timeSlots.find((t) => t.id === timeSlotId);
+      const { timeSlot, court, day } = slotData;
       
-      if (!timeSlot) return;
-
       // Find an opponent team
       const draggedTeam = active.data.current?.team as Team;
       const availableOpponent = teams.find(
@@ -75,14 +72,11 @@ function App() {
       if (availableOpponent) {
         addGame({
           id: `game-${Date.now()}`,
-          homeTeamId: draggedTeam.id,
-          awayTeamId: availableOpponent.id,
-          courtId,
-          timeSlotId,
+          team1Id: draggedTeam.id,
+          team2Id: availableOpponent.id,
+          court,
+          timeSlot,
           day,
-          startTime: timeSlot.startTime,
-          duration: 45,
-          status: 'scheduled',
         });
       }
     }

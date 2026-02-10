@@ -18,9 +18,9 @@ export function GameCard({ game, isConflict }: GameCardProps) {
   
   const [isHovered, setIsHovered] = useState(false);
 
-  const homeTeam = teams.find((t) => t.id === game.homeTeamId);
-  const awayTeam = teams.find((t) => t.id === game.awayTeamId);
-  const court = courts.find((c) => c.id === game.courtId);
+  const homeTeam = teams.find((t) => t.id === game.team1Id);
+  const awayTeam = teams.find((t) => t.id === game.team2Id);
+  const court = courts.find((c) => c.id === String(game.court));
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `game-${game.id}`,
