@@ -94,17 +94,30 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
 
   importTeamsFromCSV: (csv) => {
     const lines = csv.split('\n').filter((l) => l.trim());
+    if (lines.length < 2) return 0;
+
     const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
+
+    // Find column indices dynamically
+    const teamIdIdx = headers.findIndex(h => h.includes('team id') || h === 'id');
+    const nameIdx = headers.findIndex(h => h.includes('team name') || h === 'name');
+    const ageGroupIdx = headers.findIndex(h => h.includes('age') || h.includes('group'));
+    const cityIdx = headers.findIndex(h => h.includes('city'));
+    const winsIdx = headers.findIndex(h => h.includes('win'));
+    const lossesIdx = headers.findIndex(h => h.includes('loss'));
+
+    console.log('CSV columns found:', { teamIdIdx, nameIdx, ageGroupIdx, cityIdx, winsIdx, lossesIdx });
 
     let imported = 0;
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',');
       if (values.length < 2) continue;
 
-      const teamId = values[0]?.trim();
-      const name = values[1]?.trim();
+      // Use dynamic indices, fallback to position 0/1 if headers not found
+      const teamId = teamIdIdx >= 0 ? values[teamIdIdx]?.trim() : values[0]?.trim();
+      const name = nameIdx >= 0 ? values[nameIdx]?.trim() : values[1]?.trim();
 
-      if (!name) continue;
+      if (!name || name === '') continue;
 
       const team: Team = {
         id: teamId || crypto.randomUUID(),
@@ -112,22 +125,16 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
         teamId,
       };
 
-      // Try to extract other fields
-      const ageGroupIdx = headers.findIndex(h => h.includes('age') || h.includes('group'));
+      // Extract other fields using found indices
       if (ageGroupIdx >= 0) team.ageGroup = values[ageGroupIdx]?.trim();
-
-      const cityIdx = headers.findIndex(h => h.includes('city'));
       if (cityIdx >= 0) team.city = values[cityIdx]?.trim();
-
-      const winsIdx = headers.findIndex(h => h.includes('win'));
       if (winsIdx >= 0) team.wins = parseInt(values[winsIdx]) || 0;
-
-      const lossesIdx = headers.findIndex(h => h.includes('loss'));
       if (lossesIdx >= 0) team.losses = parseInt(values[lossesIdx]) || 0;
 
       get().addTeam(team);
       imported++;
     }
+    console.log(`Imported ${imported} teams`);
     return imported;
   },
 
